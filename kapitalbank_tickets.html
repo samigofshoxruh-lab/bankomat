@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kapital Bank &mdash; Заявки по банкомату</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f5c800'/%3E%3Ctext x='16' y='22' font-size='14' text-anchor='middle' fill='%23000' font-family='Arial,sans-serif'%3EKB%3C/text%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f5ee;--card:#fff;--card2:#f0f0e6;--border:#e0e0cc;--border2:#c8c8b0;
+  --dark:#111108;--dark2:#1a1a0a;
+  --y:#f5c800;--y2:#ffd900;--yd:#c89800;--ydk:#9a7200;
+  --text:#111108;--muted:#808068;--muted2:#b0b090;
+  --danger:#b81c0a;--ok:#006630;--info:#0055bb;--warn:#c87000;
+  --shadow:0 2px 12px rgba(0,0,0,.08);--shadow2:0 8px 36px rgba(0,0,0,.15);
+}
+.dk{
+  --bg:#0c0c06;--card:#141410;--card2:#1c1c14;--border:#2c2c1c;--border2:#3c3c28;
+  --text:#e0dcb0;--muted:#6c6c50;--muted2:#4c4c38;
+  --shadow:0 2px 12px rgba(0,0,0,.4);--shadow2:0 8px 36px rgba(0,0,0,.6);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",sans-serif;min-height:100vh;transition:background .25s,color .25s}
+
+/* NAV */
+.topnav{background:var(--dark2);border-bottom:3px solid var(--y);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.dk .topnav{background:#060604}
+.nav-logo{display:flex;align-items:center;gap:10px}
+.nav-logo-img{width:32px;height:32px;object-fit:contain;border-radius:2px}
+.nav-logo-name{font-family:"Bebas Neue",sans-serif;font-size:18px;letter-spacing:2px;color:var(--y);line-height:1}
+.nav-logo-sub{font-size:8px;letter-spacing:1px;color:#666;text-transform:uppercase}
+.nav-tabs{display:flex;gap:0}
+.nav-tab{padding:8px 18px;background:transparent;border:none;color:#888;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:500;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-3px;transition:all .14s;text-transform:uppercase;letter-spacing:.5px}
+.nav-tab:hover{color:var(--y)}
+.nav-tab.on{color:var(--y);border-bottom-color:var(--y);font-weight:600}
+.nav-right{display:flex;align-items:center;gap:8px}
+.hbtn{padding:6px 10px;background:rgba(255,255,255,.06);border:1px solid rgba(245,200,0,.28);border-radius:2px;color:#888;font-size:11px;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;transition:all .14s}
+.hbtn:hover{border-color:var(--y);color:var(--y)}
+
+/* PAGES */
+.page{display:none;min-height:calc(100vh - 56px)}
+.page.on{display:block}
+
+/* HERO */
+.hero{background:var(--dark2);padding:48px 20px 40px;text-align:center;border-bottom:3px solid var(--y)}
+.dk .hero{background:#060604}
+.hero h1{font-family:"Bebas Neue",sans-serif;font-size:36px;letter-spacing:2px;color:var(--y);margin-bottom:8px}
+.hero p{font-size:13px;color:#888;max-width:500px;margin:0 auto;line-height:1.7}
+
+/* CONTAINER */
+.wrap{max-width:860px;margin:0 auto;padding:28px 16px}
+.wrap-wide{max-width:1100px;margin:0 auto;padding:20px 16px}
+
+/* STEP CARDS */
+.step-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:32px}
+.step-card{background:var(--card);border:2px solid var(--border);border-radius:4px;padding:20px;cursor:pointer;transition:all .16s;text-align:center;box-shadow:var(--shadow)}
+.step-card:hover{border-color:var(--y);transform:translateY(-2px);box-shadow:0 6px 22px rgba(0,0,0,.1)}
+.step-card.on{border-color:var(--y);background:rgba(245,200,0,.05)}
+.step-icon{font-size:32px;margin-bottom:10px}
+.step-title{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px}
+.step-desc{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* FORM */
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:28px;box-shadow:var(--shadow);animation:fup .25s ease}
+.form-title{font-family:"Bebas Neue",sans-serif;font-size:22px;letter-spacing:1px;color:var(--dark2);margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--y)}
+.dk .form-title{color:var(--y)}
+.form-section{background:var(--card2);border:1px solid var(--border);border-radius:3px;padding:16px;margin-bottom:16px}
+.form-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:13px}
+.fg:last-child{margin-bottom:0}
+.fl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fi,.fsl,.fta{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:2px;padding:10px 12px;color:var(--text);font-family:"IBM Plex Mono",monospace;font-size:13px;outline:none;transition:border-color .18s}
+.fi:focus,.fsl:focus,.fta:focus{border-color:var(--y);box-shadow:0 0 0 3px rgba(245,200,0,.13)}
+.fi::placeholder,.fta::placeholder{color:var(--muted2);font-family:"IBM Plex Sans",sans-serif}
+.fta{min-height:80px;resize:vertical;line-height:1.6;font-family:"IBM Plex Sans",sans-serif}
+.fsl{cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:26px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fhint{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.5}
+.ferr{font-size:10px;color:var(--danger);margin-top:3px}
+.frq{font-size:11px;color:var(--muted);padding:10px 12px;background:rgba(245,200,0,.07);border-left:3px solid var(--y);border-radius:1px;margin-bottom:13px;line-height:1.6}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:2px;border:none;font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;cursor:pointer;letter-spacing:.4px;transition:all .14s;text-transform:uppercase;white-space:nowrap}
+.bny{background:var(--y);color:#000;font-size:13px}
+.bny:hover{background:var(--y2);box-shadow:0 4px 14px rgba(245,200,0,.4);transform:translateY(-1px)}
+.bny:disabled{background:var(--muted2);cursor:not-allowed;transform:none;box-shadow:none;color:#fff}
+.bng{background:transparent;border:1.5px solid var(--border2);color:var(--muted);font-size:11px;padding:8px 14px}
+.bng:hover{border-color:var(--text);color:var(--text)}
+.bndg{background:transparent;border:1.5px solid rgba(184,28,10,.35);color:var(--danger);padding:8px 14px;font-size:11px}
+.bndg:hover{background:rgba(184,28,10,.07)}
+.bw{width:100%}
+.bsm{padding:5px 10px;font-size:10px}
+.btn-grp{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* TICKET RESULT */
+.ticket-result{background:var(--card);border:2px solid var(--y);border-radius:4px;padding:28px;text-align:center;box-shadow:var(--shadow2);animation:fup .3s ease}
+.ticket-icon{font-size:48px;margin-bottom:14px}
+.ticket-num{font-family:"Bebas Neue",sans-serif;font-size:52px;color:var(--y);letter-spacing:4px;margin-bottom:8px;line-height:1}
+.ticket-label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:18px}
+.ticket-note{font-size:12px;color:var(--muted);line-height:1.7;background:var(--card2);padding:12px 16px;border-radius:2px;margin-bottom:18px;text-align:left}
+
+/* STATUS BADGE */
+.sbadge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:1px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.sb-new{background:rgba(0,85,187,.1);color:var(--info);border:1px solid rgba(0,85,187,.3)}
+.sb-wait{background:rgba(200,112,0,.1);color:var(--warn);border:1px solid rgba(200,112,0,.3)}
+.sb-done{background:rgba(0,102,48,.1);color:var(--ok);border:1px solid rgba(0,102,48,.3)}
+
+/* SEARCH BOX */
+.search-box{background:var(--card);border:1px solid var(--border);border-radius:4px;padding:24px;box-shadow:var(--shadow);margin-bottom:20px}
+.search-box h3{font-family:"Bebas Neue",sans-serif;font-size:18px;letter-spacing:1px;color:var(--dark2);margin-bottom:14px}
+.dk .search-box h3{color:var(--y)}
+.search-row{display:flex;gap:10px}
+.search-row .fi{margin:0;flex:1}
+
+/* TICKET STATUS CARD */
+.ticket-status-card{background:var(--card);border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:var(--shadow);animation:fup .25s ease}
+.tsc-head{background:var(--dark2);padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.dk .tsc-head{background:#060604;border-bottom:2px solid var(--y)}
+.tsc-num{font-family:"Bebas Neue",sans-serif;font-size:24px;color:var(--y);letter-spacing:2px}
+.tsc-body{padding:20px}
+.tsc-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.tsc-row:last-child{border:none}
+.tsc-label{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:600;min-width:120px;flex-shrink:0;margin-top:2px}
+.tsc-val{font-size:13px;color:var(--text);line-height:1.5}
+.comment-box{background:var(--card2);border:1px solid var(--border);border-radius:2px;padding:14px;margin-top:14px}
+.comment-box-title{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.comment-text{font-size:13px;color:var(--text);line-height:1.7;white-space:pre-wrap}
+
+/* ADMIN */
+.admin-login{min-height:calc(100vh - 56px);display:flex;align-items:center;justify-content:center;padding:20px}
+.admin-login-card{background:var(--card);border:1px solid var(--border);border-radius:4px;width:100%;max-width:380px;overflow:hidden;box-shadow:var(--shadow2);animation:fup .3s ease}
+.alc-head{background:var(--dark2);padding:20px 24px;display:flex;align-items:center;gap:12px}
+.dk .alc-head{background:#060604;border-bottom:2px solid var(--y)}
+.alc-head-text .t1{font-family:"Bebas Neue",sans-serif;font-size:18px;letter-spacing:2px;color:var(--y)}
+.alc-head-text .t2{font-size:9px;color:#666;letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.alc-body{padding:22px 24px 26px}
+.err{color:var(--danger);font-size:11px;margin-top:4px;min-height:14px}
+
+/* ADMIN PANEL */
+.admin-panel{display:none}
+.admin-panel.on{display:block}
+.admin-header{background:var(--card);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.admin-tabs{display:flex;gap:4px;flex-wrap:wrap}
+.atab{padding:7px 14px;background:var(--card2);border:1.5px solid var(--border);border-radius:2px;color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;transition:all .12s;text-transform:uppercase;letter-spacing:.4px}
+.atab:hover{color:var(--text);border-color:var(--border2)}
+.atab.on{background:var(--dark2);color:var(--y);border-color:var(--dark2)}
+.dk .atab.on{background:#060604;border-color:var(--y)}
+.apanel{display:none}.apanel.on{display:block}
+
+/* TICKET TABLE */
+.ticket-table-wrap{overflow-x:auto}
+.ttable{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+.ttable th{text-align:left;padding:9px 12px;border-bottom:2px solid var(--border);color:var(--muted);font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;background:var(--card2);position:sticky;top:0}
+.ttable td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ttable tr:hover td{background:var(--card2)}
+.ttable tr.selected td{background:rgba(245,200,0,.05)}
+.t-clickable{cursor:pointer}
+
+/* TICKET DETAIL */
+.td-head{background:var(--dark2);padding:16px 24px;display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--y)}
+.dk .td-head{background:#060604}
+.td-num{font-family:"Bebas Neue",sans-serif;font-size:22px;color:var(--y);letter-spacing:2px}
+.td-body{padding:20px 24px}
+.td-section{margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.td-section:last-child{border:none;margin-bottom:0;padding-bottom:0}
+.td-section-title{font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:12px}
+.td-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.td-field{background:var(--card2);border:1px solid var(--border);border-radius:2px;padding:10px 12px}
+.td-field-label{font-size:9px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-bottom:4px}
+.td-field-val{font-size:13px;color:var(--text);font-family:"IBM Plex Mono",monospace;word-break:break-all}
+.td-full{grid-column:1/-1}
+
+/* STATUS SELECT */
+.stat-sel{padding:6px 28px 6px 10px;background:var(--card2);border:1.5px solid var(--border);border-radius:2px;color:var(--text);font-family:"IBM Plex Sans",sans-serif;font-size:12px;font-weight:600;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.stat-sel:focus{border-color:var(--y)}
+
+/* COMMENT FORM */
+.cmt-form{background:var(--card2);border:1px solid var(--border);border-radius:2px;padding:14px}
+.cmt-form textarea{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:2px;padding:10px 12px;color:var(--text);font-family:"IBM Plex Sans",sans-serif;font-size:12px;outline:none;min-height:80px;resize:vertical;line-height:1.6;margin-bottom:10px}
+.cmt-form textarea:focus{border-color:var(--y)}
+
+/* USERS TABLE */
+.ut{width:100%;border-collapse:collapse;font-size:12px}
+.ut th{text-align:left;padding:8px 10px;border-bottom:2px solid var(--border);color:var(--muted);font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;background:var(--card2)}
+.ut td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.ut tr:hover td{background:var(--card2)}
+.nuf{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:14px;background:var(--card2);padding:12px;border-radius:2px;border:1px solid var(--border)}
+
+/* STATS */
+.stat-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:3px;padding:16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.stat-card::after{content:"";position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--y)}
+.stat-card-v{font-family:"Bebas Neue",sans-serif;font-size:40px;color:var(--dark2);line-height:1}
+.dk .stat-card-v{color:var(--y)}
+.stat-card-l{font-size:9px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;font-weight:600;margin-top:4px}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.filter-bar .fi{margin:0;max-width:200px;padding:7px 10px;font-size:12px}
+.filter-bar .fsl{margin:0;padding:7px 28px 7px 10px;font-size:12px;max-width:180px}
+
+/* MODAL */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);z-index:400;align-items:flex-start;justify-content:center;padding:36px 16px;overflow-y:auto}
+.mo.on{display:flex}
+.mb{background:var(--card);border:1px solid var(--border);border-radius:4px;width:100%;max-width:720px;margin:auto;box-shadow:var(--shadow2);overflow:hidden;animation:fup .2s ease}
+.mb-sm{max-width:400px}
+.mo-head{background:var(--dark2);padding:16px 22px;display:flex;align-items:center;justify-content:space-between}
+.dk .mo-head{background:#060604;border-bottom:2px solid var(--y)}
+.mo-title{font-family:"Bebas Neue",sans-serif;font-size:18px;letter-spacing:1.5px;color:var(--y)}
+.cx{background:transparent;border:1.5px solid rgba(245,200,0,.3);border-radius:2px;color:#888;font-size:15px;width:28px;height:28px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .14s}
+.cx:hover{color:var(--y);border-color:var(--y)}
+.mo-body{padding:20px 22px 24px}
+
+/* MISC */
+.divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.dot{width:6px;height:6px;border-radius:50%;display:inline-block;flex-shrink:0}
+.type-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 8px;border-radius:1px;font-size:10px;font-weight:700;letter-spacing:.4px;border:1px solid var(--border);background:var(--card2);color:var(--muted)}
+.empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:13px}
+.empty .ei{font-size:36px;margin-bottom:10px;opacity:.25}
+
+/* TOAST */
+#toast{position:fixed;bottom:18px;right:18px;z-index:9999;display:flex;flex-direction:column;gap:5px;max-width:280px}
+.ti{background:var(--card);border:1px solid var(--border);border-radius:2px;padding:10px 14px;font-size:11px;animation:sin .2s ease;word-break:break-word;box-shadow:var(--shadow)}
+.tok{border-left:3px solid var(--ok);color:var(--ok)}
+.terr{border-left:3px solid var(--danger);color:var(--danger)}
+.tinf{border-left:3px solid var(--y);color:var(--ydk)}
+
+@keyframes fup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:var(--yd)}
+
+@media(max-width:600px){
+  .frow{grid-template-columns:1fr}
+  .step-grid{grid-template-columns:repeat(2,1fr)}
+  .filter-bar .fi,.filter-bar .fsl{max-width:100%;width:100%}
+  .btn-grp{flex-direction:column}
+  .btn-grp .btn{width:100%}
+  .nuf{grid-template-columns:1fr}
+  .nav-tabs{display:none}
+}
+</style>
+</head>
+<body>
+<nav class="topnav">
+<div class="nav-logo"><img class="nav-logo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f5c800'/%3E%3Ctext x='16' y='22' font-size='14' text-anchor='middle' fill='%23000' font-family='Arial,sans-serif'%3EKB%3C/text%3E%3C/svg%3E" alt="KB"><div><div class="nav-logo-name">KAPITAL BANK</div><div class="nav-logo-sub">ATM Support</div></div></div>
+<div class="nav-tabs">
+<button class="nav-tab on" data-tab="client" onclick="showPage('client')">&#128203; Оставить заявку</button>
+<button class="nav-tab" data-tab="status" onclick="showPage('status')">&#128269; Проверить заявку</button>
+<button class="nav-tab" data-tab="admin" onclick="showPage('admin')">&#128274; Администратор</button>
+</div>
+<div class="nav-right">
+<button class="hbtn" onclick="openM('m-setup')" title="Настройки">&#9881;</button>
+<button class="hbtn" onclick="togTheme()" title="Тема">&#9790;</button>
+</div>
+</nav>
+<div class="page on" id="page-client">
+<div class="hero">
+<h1>ATM Support</h1>
+<p>Оставьте заявку по проблеме с банкоматом. Выберите тип обращения и заполните форму.</p>
+</div>
+<div class="wrap">
+<div class="step-grid">
+<div class="step-card" data-type="card_stuck" onclick="selectType('card_stuck')">
+<div class="step-icon">&#128179;</div>
+<div class="step-title">Карта застряла</div>
+<div class="step-desc">Банкомат не вернул карту</div>
+</div>
+<div class="step-card" data-type="no_cash" onclick="selectType('no_cash')">
+<div class="step-icon">&#128181;</div>
+<div class="step-title">Не выдал деньги</div>
+<div class="step-desc">Сумма списана, но наличные не выданы</div>
+</div>
+<div class="step-card" data-type="top_up" onclick="selectType('top_up')">
+<div class="step-icon">&#128197;</div>
+<div class="step-title">Пополнение не пришло</div>
+<div class="step-desc">Внесли деньги, но баланс не изменился</div>
+</div>
+<div class="step-card" data-type="credit" onclick="selectType('credit')">
+<div class="step-icon">&#127970;</div>
+<div class="step-title">Оплата кредита</div>
+<div class="step-desc">Оплатил кредит, но средства не поступили</div>
+</div>
+</div>
+<div id="client-form-wrap"></div>
+
+<div class="search-box" style="margin-top:28px">
+<h3>&#128269; Найти заявку по номеру телефона</h3>
+<div class="search-row">
+<input class="fi" id="search-phone-in" type="tel" placeholder="+998901234567">
+<button class="btn bny" onclick="searchByPhone()">Найти</button>
+</div>
+</div>
+</div>
+</div>
+<div class="page" id="page-status">
+<div class="hero"><h1>Проверить заявку</h1><p>Введите номер тикета или номер телефона для поиска вашей заявки.</p></div>
+<div class="wrap">
+<div class="search-box">
+<h3>&#128203; По номеру тикета</h3>
+<div class="search-row">
+<input class="fi" id="search-ticket-in" placeholder="Например: 10000001" style="font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600">
+<button class="btn bny" onclick="doSearchTicket()">Найти</button>
+</div>
+</div>
+<div class="search-box">
+<h3>&#128222; По номеру телефона</h3>
+<div class="search-row">
+<input class="fi" id="search-phone-in2" type="tel" placeholder="+998901234567">
+<button class="btn bny" onclick="document.getElementById('search-phone-in').value=document.getElementById('search-phone-in2').value;searchByPhone()">Найти</button>
+</div>
+</div>
+<div id="status-result"></div>
+</div>
+</div>
+<div class="page" id="page-admin">
+<div id="admin-login-wrap" class="admin-login">
+<div class="admin-login-card">
+<div class="alc-head"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f5c800'/%3E%3Ctext x='16' y='22' font-size='14' text-anchor='middle' fill='%23000' font-family='Arial,sans-serif'%3EKB%3C/text%3E%3C/svg%3E" alt="KB" style="width:36px;height:36px;object-fit:contain;border-radius:2px"><div class="alc-head-text"><div class="t1">KAPITAL BANK</div><div class="t2">Admin Panel &mdash; Вход</div></div>
+</div>
+<div class="alc-body">
+<div class="fg"><label class="fl">Логин</label><input class="fi" id="adm-log" type="text" placeholder="логин" autocomplete="username"></div>
+<div class="fg"><label class="fl">Пароль</label><input class="fi" id="adm-pas" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" id="a-pas2" autocomplete="current-password"></div>
+<button class="btn bny bw" onclick="doAdminLogin()">&#9654; ВОЙТИ</button>
+<div class="err" id="adm-err"></div>
+</div>
+</div>
+</div>
+
+<div class="admin-panel" id="admin-panel">
+<div class="admin-header">
+<div class="admin-tabs">
+<button class="atab on" onclick="swAdmTab('adm-tickets',this)">&#128203; Заявки</button>
+<button class="atab" onclick="swAdmTab('adm-stats',this)">&#128202; Статистика</button>
+<button class="atab" id="admin-users-tab" onclick="swAdmTab('adm-users',this)">&#128101; Пользователи</button>
+</div>
+<div style="display:flex;align-items:center;gap:10px">
+<span style="font-size:11px;color:var(--muted)">&#128100; <span id="adm-username"></span></span>
+<button class="btn bng bsm" onclick="loadDB().then(function(){renderAdminTickets();renderAdminStats();toast('Синхронизировано','ok')})">&#8635; Обновить</button>
+<button class="btn bndg bsm" onclick="adminLogout()">Выйти</button>
+</div>
+</div>
+
+<div class="apanel on" id="adm-tickets">
+<div class="wrap-wide">
+<div class="filter-bar">
+<input class="fi" placeholder="Поиск по тикету, телефону, ФИО..." oninput="adminFilter.search=this.value;renderAdminTickets()">
+<select class="fsl" onchange="adminFilter.status=this.value;renderAdminTickets()">
+<option value="">Все статусы</option>
+<option value="new">Новая заявка</option>
+<option value="wait">Ожидание ответа</option>
+<option value="done">Завершена</option>
+</select>
+<select class="fsl" onchange="adminFilter.type=this.value;renderAdminTickets()">
+<option value="">Все типы</option>
+<option value="card_stuck">Карта застряла</option>
+<option value="no_cash">Не выдал деньги</option>
+<option value="top_up">Пополнение</option>
+<option value="credit">Оплата кредита</option>
+</select>
+</div>
+<div class="ticket-table-wrap">
+<table class="ttable">
+<thead><tr><th>Тикет</th><th>Статус</th><th>Тип</th><th>Телефон</th><th>ФИО</th><th>ID банкомата</th><th>Дата</th></tr></thead>
+<tbody id="adm-tbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div class="apanel" id="adm-stats">
+<div class="wrap"><div id="stats-wrap"></div></div>
+</div>
+
+<div class="apanel" id="adm-users">
+<div class="wrap">
+<div class="nuf">
+<div><label class="fl">Логин</label><input class="fi" id="nu-l" placeholder="логин" style="margin:0"></div>
+<div><label class="fl">Пароль</label><input class="fi" id="nu-p" type="text" placeholder="пароль" style="margin:0"></div>
+<div style="padding-top:18px"><button class="btn bny bsm" onclick="addUser()">+ Добавить</button></div>
+<input type="hidden" id="nu-r" value="operator">
+</div>
+<table class="ut">
+<thead><tr><th>Логин</th><th>Роль</th><th></th></tr></thead>
+<tbody id="users-tbody"></tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+
+<div class="mo" id="m-ticket-detail">
+<div class="mb" style="max-width:720px">
+<div class="mo-head"><div class="mo-title">Тикет</div><button class="cx" onclick="closeM('m-ticket-detail')">&#215;</button></div>
+<div class="mo-body" id="ticket-detail-body"></div>
+</div>
+</div>
+
+<div class="mo" id="m-setup">
+<div class="mb mb-sm">
+<div class="mo-head"><div class="mo-title">&#9881; Настройки базы данных</div><button class="cx" onclick="closeM('m-setup')">&#215;</button></div>
+<div class="mo-body">
+<div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.7">Сайт использует GitHub Gist как базу данных. Введите токен и Gist ID.</div>
+<div class="fg"><label class="fl">GitHub Token</label><input class="fi" id="cfg-tok" type="password" placeholder="ghp_xxxxxxxxxxxx"></div>
+<div class="fg"><label class="fl">Gist ID</label><input class="fi" id="cfg-gst" placeholder="abc123..."></div>
+<div class="err" id="cfg-err"></div>
+<div style="display:flex;gap:8px;margin-top:12px">
+<button class="btn bny" onclick="saveSetup()" style="flex:1">&#9654; Подключить</button>
+<button class="btn bng" onclick="initNewDB()">Создать новую</button>
+</div>
+</div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+function swAdmTab(id,btn){
+  document.querySelectorAll('.apanel').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.atab').forEach(function(t){t.classList.remove('on');});
+  document.getElementById(id).classList.add('on');btn.classList.add('on');
+  if(id==='adm-stats')renderAdminStats();
+  if(id==='adm-users')renderAdminUsers();
+}
+</script>
+<script>
+
+// ===== CONFIG =====
+var GF='kb_tickets_db.json';
+var TOK='',GST='',DB={tickets:[],users:[],log:[],ticketCounter:10000000};
+var ADMIN_ME=null;
+var TICKET_TYPES={
+  card_stuck:'\u041a\u0430\u0440\u0442\u0430 \u0437\u0430\u0441\u0442\u0440\u044f\u043b\u0430',
+  no_cash:'\u041d\u0435 \u0432\u044b\u0434\u0430\u043b \u0434\u0435\u043d\u044c\u0433\u0438',
+  top_up:'\u041f\u043e\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u0435 \u043d\u0435 \u043f\u0440\u0438\u0448\u043b\u043e',
+  credit:'\u041e\u043f\u043b\u0430\u0442\u0430 \u043a\u0440\u0435\u0434\u0438\u0442\u0430'
+};
+var STATUSES={
+  new:'\u041d\u043e\u0432\u0430\u044f \u0437\u0430\u044f\u0432\u043a\u0430',
+  wait:'\u041e\u0436\u0438\u0434\u0430\u043d\u0438\u0435 \u043e\u0442\u0432\u0435\u0442\u0430',
+  done:'\u0417\u0430\u044f\u0432\u043a\u0430 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0430'
+};
+
+// ===== GIST DB =====
+function loadDB(){
+  return fetch('https://api.github.com/gists/'+GST,{headers:{Authorization:'token '+TOK}})
+    .then(function(r){if(!r.ok)return false;return r.json();})
+    .then(function(g){
+      if(!g)return false;
+      var raw=g.files&&g.files[GF]&&g.files[GF].content;
+      if(!raw)return false;
+      try{DB=JSON.parse(raw);}catch(e){return false;}
+      if(!DB.tickets)DB.tickets=[];
+      if(!DB.users)DB.users=[];
+      if(!DB.log)DB.log=[];
+      if(!DB.ticketCounter||DB.ticketCounter<10000000)DB.ticketCounter=10000000;
+      return true;
+    }).catch(function(){return false;});
+}
+function saveDB(){
+  var body={};body[GF]={content:JSON.stringify(DB,null,2)};
+  return fetch('https://api.github.com/gists/'+GST,{
+    method:'PATCH',
+    headers:{Authorization:'token '+TOK,'Content-Type':'application/json'},
+    body:JSON.stringify({files:body})
+  }).then(function(r){return r.ok;}).catch(function(){return false;});
+}
+
+function nextTicketNum(){
+  DB.ticketCounter=(DB.ticketCounter||10000000)+1;
+  return String(DB.ticketCounter);
+}
+
+// ===== SETUP CHECK =====
+function checkSetup(){
+  TOK=localStorage.getItem('kb_tok')||'';
+  GST=localStorage.getItem('kb_gst')||'';
+  if(!TOK||!GST)return false;
+  return true;
+}
+
+// ===== NAVIGATION =====
+function showPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.querySelectorAll('.nav-tab').forEach(function(t){t.classList.remove('on');});
+  var p=document.getElementById('page-'+id);if(p)p.classList.add('on');
+  var t=document.querySelector('[data-tab="'+id+'"]');if(t)t.classList.add('on');
+}
+
+// ===== CLIENT PAGE =====
+var selectedType=null;
+
+function selectType(type){
+  selectedType=type;
+  document.querySelectorAll('.step-card').forEach(function(c){c.classList.remove('on');});
+  var c=document.querySelector('[data-type="'+type+'"]');if(c)c.classList.add('on');
+  renderClientForm(type);
+}
+
+function renderClientForm(type){
+  var wrap=document.getElementById('client-form-wrap');
+  var titles={card_stuck:'&#128179; \u041a\u0430\u0440\u0442\u0430 \u0437\u0430\u0441\u0442\u0440\u044f\u043b\u0430',no_cash:'&#128181; \u041d\u0435 \u0432\u044b\u0434\u0430\u043b \u0434\u0435\u043d\u044c\u0433\u0438',top_up:'&#128197; \u041f\u043e\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u0435 \u043d\u0435 \u043f\u0440\u0438\u0448\u043b\u043e',credit:'&#127970; \u041e\u043f\u043b\u0430\u0442\u0430 \u043a\u0440\u0435\u0434\u0438\u0442\u0430'};
+
+  var atm_fields='<div class="fg"><label class="fl">\u041d\u043e\u043c\u0435\u0440 \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430 / \u0442\u0435\u0440\u043c\u0438\u043d\u0430\u043b\u0430 (ID)</label>'
+    +'<input class="fi" id="f-atm" placeholder="\u041d\u0430\u043f\u0440\u0438\u043c\u0435\u0440: 12345 \u0438\u043b\u0438 12345678">'
+    +'<div class="fhint">&#128221; \u041d\u0430 \u0447\u0435\u043a\u0435 \u0432\u043e 2-\u043c \u0440\u044f\u0434\u0443 \u0441\u043b\u043e\u0432\u043e \u00ab\u0422\u0435\u0440\u043c\u0438\u043d\u0430\u043b\u00bb (8 \u0446\u0438\u0444\u0440) \u0438\u043b\u0438 \u00ab\u0411\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u00bb (5 \u0446\u0438\u0444\u0440). \u0422\u0430\u043a\u0436\u0435 \u0432\u0438\u0434\u0435\u043d \u043d\u0430 \u044d\u043a\u0440\u0430\u043d\u0435 \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430.</div></div>'
+    +'<div class="frow"><div class="fg"><label class="fl">\u0414\u0430\u0442\u0430 \u0438\u043d\u0446\u0438\u0434\u0435\u043d\u0442\u0430</label><input class="fi" type="date" id="f-date"></div>'
+    +'<div class="fg"><label class="fl">\u0412\u0440\u0435\u043c\u044f \u0438\u043d\u0446\u0438\u0434\u0435\u043d\u0442\u0430</label><input class="fi" type="time" id="f-time"></div></div>';
+
+  var owner_fields='<div class="fg"><label class="fl">\u041f\u043e\u043b\u043d\u043e\u0435 \u0424\u0418\u041e \u0432\u043b\u0430\u0434\u0435\u043b\u044c\u0446\u0430 \u043a\u0430\u0440\u0442\u044b</label>'
+    +'<input class="fi" id="f-name" placeholder="\u0424\u0430\u043c\u0438\u043b\u0438\u044f \u0418\u043c\u044f \u041e\u0442\u0447\u0435\u0441\u0442\u0432\u043e"></div>'
+    +'<div class="fg"><label class="fl">\u041d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430 \u0434\u043b\u044f \u0441\u0432\u044f\u0437\u0438</label>'
+    +'<input class="fi" id="f-phone" type="tel" placeholder="+998901234567">'
+    +'<div class="fhint">\u041f\u043e \u044d\u0442\u043e\u043c\u0443 \u043d\u043e\u043c\u0435\u0440\u0443 \u043c\u043e\u0436\u043d\u043e \u043d\u0430\u0439\u0442\u0438 \u0441\u0432\u043e\u044e \u0437\u0430\u044f\u0432\u043a\u0443. 1 \u043d\u043e\u043c\u0435\u0440 = 1 \u0437\u0430\u044f\u0432\u043a\u0430.</div></div>';
+
+  var card_last4='<div class="fg"><label class="fl">\u041f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 4 \u0446\u0438\u0444\u0440\u044b \u043a\u0430\u0440\u0442\u044b</label>'
+    +'<input class="fi" id="f-last4" maxlength="4" placeholder="1234">'
+    +'<div class="fhint">\u0412\u0438\u0434\u043d\u044b \u043d\u0430 \u044d\u043a\u0440\u0430\u043d\u0435 \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430 \u0432 \u043c\u043e\u043c\u0435\u043d\u0442 \u043e\u043f\u0435\u0440\u0430\u0446\u0438\u0438</div></div>';
+
+  var card_full='<div class="fg"><label class="fl">\u041f\u043e\u043b\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043a\u0430\u0440\u0442\u044b</label>'
+    +'<input class="fi" id="f-cardnum" maxlength="19" placeholder="8600 1234 5678 9012" oninput="fmtCard(this)"></div>';
+
+  var card_bank='<div class="fg"><label class="fl">\u0411\u0430\u043d\u043a \u043a\u0430\u0440\u0442\u044b</label>'
+    +'<select class="fsl" id="f-bank">'
+    +'<option value="">\u2014 \u0432\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0431\u0430\u043d\u043a \u2014</option>'
+    +'<option>Kapital Bank</option><option>Ipoteka Bank</option><option>Agrobank</option>'
+    +'<option>NBU</option><option>Hamkorbank</option><option>SQB</option>'
+    +'<option>Asaka Bank</option><option>TBC Bank</option><option>Uzpromstroybank</option>'
+    +'<option>\u0414\u0440\u0443\u0433\u043e\u0439 \u0431\u0430\u043d\u043a</option>'
+    +'</select></div>';
+
+  var amount='<div class="fg"><label class="fl">\u0421\u0443\u043c\u043c\u0430 (\u0441\u0443\u043c)</label>'
+    +'<input class="fi" id="f-amount" type="number" placeholder="\u041d\u0430\u043f\u0440\u0438\u043c\u0435\u0440: 500000"></div>';
+
+  var credit_id='<div class="fg"><label class="fl">ID \u043d\u043e\u043c\u0435\u0440 \u043a\u0440\u0435\u0434\u0438\u0442\u0430</label>'
+    +'<input class="fi" id="f-creditid" placeholder="\u041d\u043e\u043c\u0435\u0440 \u043a\u0440\u0435\u0434\u0438\u0442\u0430"></div>';
+
+  var type_fields='';
+  if(type==='card_stuck'){
+    type_fields=atm_fields+card_last4+card_bank+owner_fields;
+  } else if(type==='no_cash'){
+    type_fields=atm_fields+card_full+card_bank+amount+owner_fields;
+  } else if(type==='top_up'){
+    type_fields=atm_fields+card_full+card_bank+amount+owner_fields;
+  } else if(type==='credit'){
+    type_fields=atm_fields+card_full+card_bank+amount+credit_id+owner_fields;
+  }
+
+  var hints={
+    card_stuck:'<div class="frq">&#128221; <strong>\u0427\u0442\u043e \u043d\u0443\u0436\u043d\u043e \u0434\u043b\u044f \u0437\u0430\u044f\u0432\u043a\u0438:</strong> \u0434\u0430\u0442\u0430 \u0438 \u0432\u0440\u0435\u043c\u044f \u0438\u043d\u0446\u0438\u0434\u0435\u043d\u0442\u0430, ID \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430 (\u0441 \u0447\u0435\u043a\u0430 \u0438\u043b\u0438 \u044d\u043a\u0440\u0430\u043d\u0430), \u043f\u043e\u0441\u043b\u0435\u0434\u043d\u0438\u0435 4 \u0446\u0438\u0444\u0440\u044b \u043a\u0430\u0440\u0442\u044b, \u0431\u0430\u043d\u043a, \u0424\u0418\u041e \u0438 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430.</div>',
+    no_cash:'<div class="frq">&#128221; <strong>\u0427\u0442\u043e \u043d\u0443\u0436\u043d\u043e:</strong> \u0442\u043e\u0447\u043d\u044b\u0435 \u0434\u0430\u0442\u0430 \u0438 \u0432\u0440\u0435\u043c\u044f, ID \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430, \u043f\u043e\u043b\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043a\u0430\u0440\u0442\u044b, \u0441\u0443\u043c\u043c\u0430, \u0424\u0418\u041e \u0438 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430.</div>',
+    top_up:'<div class="frq">&#128221; <strong>\u0427\u0442\u043e \u043d\u0443\u0436\u043d\u043e:</strong> \u0434\u0430\u0442\u0430 \u0438 \u0432\u0440\u0435\u043c\u044f, ID \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430, \u043f\u043e\u043b\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043a\u0430\u0440\u0442\u044b, \u0441\u0443\u043c\u043c\u0430 \u043f\u043e\u043f\u043e\u043b\u043d\u0435\u043d\u0438\u044f, \u0424\u0418\u041e \u0438 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430.</div>',
+    credit:'<div class="frq">&#128221; <strong>\u0427\u0442\u043e \u043d\u0443\u0436\u043d\u043e:</strong> \u0434\u0430\u0442\u0430 \u0438 \u0432\u0440\u0435\u043c\u044f, ID \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430, \u043f\u043e\u043b\u043d\u044b\u0439 \u043d\u043e\u043c\u0435\u0440 \u043a\u0430\u0440\u0442\u044b, ID \u043a\u0440\u0435\u0434\u0438\u0442\u0430, \u0441\u0443\u043c\u043c\u0430, \u0424\u0418\u041e \u0438 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430.</div>'
+  };
+
+  wrap.innerHTML='<div class="form-card">'
+    +'<div class="form-title">'+titles[type]+'</div>'
+    +hints[type]
+    +'<div class="form-section"><div class="form-section-title">&#128196; \u0418\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f \u043e\u0431 \u0438\u043d\u0446\u0438\u0434\u0435\u043d\u0442\u0435</div>'+type_fields+'</div>'
+    +'<div class="btn-grp">'
+    +'<button class="btn bng" onclick="cancelForm()">\u041e\u0442\u043c\u0435\u043d\u0430</button>'
+    +'<button class="btn bny" onclick="submitForm()">\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 &rarr;</button>'
+    +'</div></div>';
+  wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function cancelForm(){
+  selectedType=null;
+  document.querySelectorAll('.step-card').forEach(function(c){c.classList.remove('on');});
+  document.getElementById('client-form-wrap').innerHTML='';
+}
+
+function fmtCard(el){
+  var v=el.value.replace(/\D/g,'').slice(0,16);
+  el.value=v.replace(/(.{4})/g,'$1 ').trim();
+}
+
+function gv(id){var e=document.getElementById(id);return e?e.value.trim():'';}
+
+function submitForm(){
+  if(!selectedType){toast('\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0442\u0438\u043f \u0437\u0430\u044f\u0432\u043a\u0438','err');return;}
+  var phone=gv('f-phone');
+  if(!phone){toast('\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430','err');return;}
+  var name=gv('f-name');
+  if(!name){toast('\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0424\u0418\u041e','err');return;}
+  var atm=gv('f-atm');
+  if(!atm){toast('\u0412\u0432\u0435\u0434\u0438\u0442\u0435 ID \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430','err');return;}
+  var dt=gv('f-date'),tm=gv('f-time');
+  if(!dt||!tm){toast('\u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u0434\u0430\u0442\u0443 \u0438 \u0432\u0440\u0435\u043c\u044f','err');return;}
+
+  // Check duplicate by phone
+  var existing=DB.tickets.find(function(t){return t.phone===phone&&t.status!=='done';});
+  if(existing){
+    showDuplicateBlock(existing.ticketNum);
+    return;
+  }
+
+  var ticket={
+    id:Date.now(),
+    ticketNum:nextTicketNum(),
+    type:selectedType,
+    status:'new',
+    createdAt:Date.now(),
+    phone:phone,
+    ownerName:name,
+    atmId:atm,
+    incidentDate:dt,
+    incidentTime:tm,
+    comment:'',
+    adminNote:''
+  };
+
+  if(selectedType==='card_stuck'){
+    ticket.cardLast4=gv('f-last4');
+    ticket.bank=gv('f-bank');
+  } else if(selectedType==='no_cash'||selectedType==='top_up'){
+    ticket.cardNum=gv('f-cardnum');
+    ticket.bank=gv('f-bank');
+    ticket.amount=gv('f-amount');
+  } else if(selectedType==='credit'){
+    ticket.cardNum=gv('f-cardnum');
+    ticket.bank=gv('f-bank');
+    ticket.amount=gv('f-amount');
+    ticket.creditId=gv('f-creditid');
+  }
+
+  // Check setup
+  if(!TOK||!GST){
+    // Save locally if no backend
+    toast('\u0411\u0430\u0437\u0430 \u043d\u0435 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0430. \u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u043d\u0430\u0441\u0442\u0440\u043e\u0439\u0442\u0435 \u0441\u043e\u0435\u0434\u0438\u043d\u0435\u043d\u0438\u0435.','err');
+    return;
+  }
+
+  var btn=document.querySelector('[onclick="submitForm()"]');
+  if(btn){btn.disabled=true;btn.textContent='\u041e\u0442\u043f\u0440\u0430\u0432\u043a\u0430...';}
+  DB.tickets.push(ticket);
+  saveDB().then(function(ok){
+    if(ok){showTicketSuccess(ticket.ticketNum);}
+    else{
+      DB.tickets.pop();
+      DB.ticketCounter--;
+      toast('\u041e\u0448\u0438\u0431\u043a\u0430 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u044f. \u041f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0435\u0449\u0451.','err');
+      if(btn){btn.disabled=false;btn.textContent='\u041e\u0442\u043f\u0440\u0430\u0432\u0438\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443 \u2192';}
+    }
+  });
+}
+
+function showDuplicateBlock(num){
+  var wrap=document.getElementById('client-form-wrap');
+  wrap.innerHTML='<div class="ticket-result" style="border-color:var(--warn)">'
+    +'<div class="ticket-icon">&#9888;&#65039;</div>'
+    +'<div style="font-size:15px;font-weight:600;color:var(--warn);margin-bottom:10px">\u0423 \u0432\u0430\u0441 \u0443\u0436\u0435 \u0435\u0441\u0442\u044c \u0430\u043a\u0442\u0438\u0432\u043d\u0430\u044f \u0437\u0430\u044f\u0432\u043a\u0430</div>'
+    +'<div class="ticket-num">'+num+'</div>'
+    +'<div class="ticket-label">\u0412\u0430\u0448 \u043d\u043e\u043c\u0435\u0440 \u0442\u0438\u043a\u0435\u0442\u0430</div>'
+    +'<div class="ticket-note">\u0421 \u044d\u0442\u043e\u0433\u043e \u043d\u043e\u043c\u0435\u0440\u0430 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430 \u0443\u0436\u0435 \u0435\u0441\u0442\u044c \u0430\u043a\u0442\u0438\u0432\u043d\u0430\u044f \u0437\u0430\u044f\u0432\u043a\u0430. \u041d\u0435\u043b\u044c\u0437\u044f \u043e\u0441\u0442\u0430\u0432\u0438\u0442\u044c \u0431\u043e\u043b\u0435\u0435 \u043e\u0434\u043d\u043e\u0439 \u0437\u0430\u044f\u0432\u043a\u0438 \u043f\u043e \u043e\u0434\u043d\u043e\u043c\u0443 \u043d\u043e\u043c\u0435\u0440\u0443 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430. \u0418\u0441\u043f\u043e\u043b\u044c\u0437\u0443\u0439\u0442\u0435 \u043d\u043e\u043c\u0435\u0440 \u0442\u0438\u043a\u0435\u0442\u0430 \u0434\u043b\u044f \u043e\u0442\u0441\u043b\u0435\u0436\u0438\u0432\u0430\u043d\u0438\u044f.</div>'
+    +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+    +'<button class="btn bng" onclick="cancelForm()">\u041d\u0430\u0437\u0430\u0434</button>'
+    +'<button class="btn bny" onclick="searchByTicket(\''+num+'\')">\u041e\u0442\u0441\u043b\u0435\u0434\u0438\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443</button>'
+    +'</div></div>';
+  wrap.scrollIntoView({behavior:'smooth'});
+}
+
+function showTicketSuccess(num){
+  var wrap=document.getElementById('client-form-wrap');
+  wrap.innerHTML='<div class="ticket-result">'
+    +'<div class="ticket-icon">&#9989;</div>'
+    +'<div class="ticket-num">'+num+'</div>'
+    +'<div class="ticket-label">\u0412\u0430\u0448 \u043d\u043e\u043c\u0435\u0440 \u0442\u0438\u043a\u0435\u0442\u0430</div>'
+    +'<div class="ticket-note">&#128203; \u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u0435 \u044d\u0442\u043e\u0442 \u043d\u043e\u043c\u0435\u0440! \u041f\u043e \u043d\u0435\u043c\u0443 \u0432\u044b \u043c\u043e\u0436\u0435\u0442\u0435 \u043e\u0442\u0441\u043b\u0435\u0436\u0438\u0432\u0430\u0442\u044c \u0441\u0442\u0430\u0442\u0443\u0441 \u0437\u0430\u044f\u0432\u043a\u0438 \u0432\u043e \u0432\u043a\u043b\u0430\u0434\u043a\u0435 &laquo;\u041f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443&raquo;. \u0422\u0430\u043a\u0436\u0435 \u043c\u043e\u0436\u043d\u043e \u043d\u0430\u0439\u0442\u0438 \u043f\u043e \u0432\u0430\u0448\u0435\u043c\u0443 \u043d\u043e\u043c\u0435\u0440\u0443 \u0442\u0435\u043b\u0435\u0444\u043e\u043d\u0430.</div>'
+    +'<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">'
+    +'<button class="btn bng" onclick="cancelForm()">\u041d\u043e\u0432\u0430\u044f \u0437\u0430\u044f\u0432\u043a\u0430</button>'
+    +'<button class="btn bny" onclick="searchByTicket(\''+num+'\')">\u041e\u0442\u0441\u043b\u0435\u0434\u0438\u0442\u044c \u0437\u0430\u044f\u0432\u043a\u0443</button>'
+    +'</div></div>';
+  selectedType=null;
+  document.querySelectorAll('.step-card').forEach(function(c){c.classList.remove('on');});
+  wrap.scrollIntoView({behavior:'smooth'});
+  toast('\u2713 \u0417\u0430\u044f\u0432\u043a\u0430 \u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u0430! \u0422\u0438\u043a\u0435\u0442: '+num,'ok');
+}
+
+// ===== SEARCH / STATUS PAGE =====
+function searchByTicket(num){
+  showPage('status');
+  var input=document.getElementById('search-ticket-in');
+  if(input)input.value=num||'';
+  doSearchTicket();
+}
+
+function searchByPhone(){
+  var phone=document.getElementById('search-phone-in').value.trim();
+  if(!phone)return;
+  showPage('status');
+  var result=document.getElementById('status-result');
+  var tickets=DB.tickets.filter(function(t){return t.phone===phone;});
+  if(!tickets.length){
+    result.innerHTML='<div class="empty"><div class="ei">&#128269;</div><p>\u0417\u0430\u044f\u0432\u043e\u043a \u0441 \u044d\u0442\u0438\u043c \u043d\u043e\u043c\u0435\u0440\u043e\u043c \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e.</p></div>';
+    return;
+  }
+  var html='<div style="font-size:12px;color:var(--muted);margin-bottom:12px">\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0437\u0430\u044f\u0432\u043e\u043a: '+tickets.length+'</div>';
+  tickets.forEach(function(t){
+    html+='<div class="ticket-status-card" style="margin-bottom:14px;cursor:pointer" onclick="showTicketStatus(\''+t.ticketNum+'\')">'
+      +'<div class="tsc-head"><div class="tsc-num">#'+t.ticketNum+'</div>'+statusBadge(t.status)+'</div>'
+      +'<div style="padding:14px 20px;font-size:12px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap">'
+      +'<span>'+TICKET_TYPES[t.type]+'</span>'
+      +'<span>'+fmtDate(t.createdAt)+'</span>'
+      +'</div></div>';
+  });
+  result.innerHTML=html;
+}
+
+function doSearchTicket(){
+  var input=document.getElementById('search-ticket-in');
+  var num=input?input.value.trim():'';
+  if(!num)return;
+  showTicketStatus(num);
+}
+
+function showTicketStatus(num){
+  var result=document.getElementById('status-result');
+  var t=DB.tickets.find(function(x){return x.ticketNum===num;});
+  if(!t){
+    result.innerHTML='<div class="empty"><div class="ei">&#128269;</div><p>\u0422\u0438\u043a\u0435\u0442 #'+esc(num)+' \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d.</p></div>';
+    return;
+  }
+  var commentSection='';
+  if(t.comment){
+    commentSection='<div class="comment-box">'
+      +'<div class="comment-box-title">&#128172; \u041a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439 \u0431\u0430\u043d\u043a\u0430</div>'
+      +'<div class="comment-text">'+esc(t.comment)+'</div>'
+      +'</div>';
+  }
+  result.innerHTML='<div class="ticket-status-card">'
+    +'<div class="tsc-head"><div class="tsc-num">#'+t.ticketNum+'</div>'+statusBadge(t.status)+'</div>'
+    +'<div class="tsc-body">'
+    +'<div class="tsc-row"><span class="tsc-label">\u0422\u0438\u043f \u0437\u0430\u044f\u0432\u043a\u0438</span><span class="tsc-val">'+esc(TICKET_TYPES[t.type]||t.type)+'</span></div>'
+    +'<div class="tsc-row"><span class="tsc-label">\u0414\u0430\u0442\u0430 \u0437\u0430\u044f\u0432\u043a\u0438</span><span class="tsc-val">'+fmtDate(t.createdAt)+'</span></div>'
+    +'<div class="tsc-row"><span class="tsc-label">\u0421\u0442\u0430\u0442\u0443\u0441</span><span class="tsc-val">'+statusBadge(t.status)+'</span></div>'
+    +commentSection
+    +'</div></div>';
+}
+
+function statusBadge(s){
+  var cls={new:'sb-new',wait:'sb-wait',done:'sb-done'}[s]||'sb-new';
+  var dots={new:'&#128309;',wait:'&#128992;',done:'&#128994;'};
+  return '<span class="sbadge '+cls+'">'+dots[s]+' '+esc(STATUSES[s]||s)+'</span>';
+}
+
+// ===== ADMIN AUTH =====
+function doAdminLogin(){
+  var login=document.getElementById('adm-log').value.trim();
+  var pass=document.getElementById('adm-pas').value;
+  var err=document.getElementById('adm-err');
+  if(!login||!pass){err.textContent='\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u0432\u0441\u0435 \u043f\u043e\u043b\u044f';return;}
+  err.textContent='\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430...';
+  loadDB().then(function(ok){
+    if(!ok){err.textContent='\u041e\u0448\u0438\u0431\u043a\u0430 \u0441\u043e\u0435\u0434\u0438\u043d\u0435\u043d\u0438\u044f \u0441 \u0431\u0430\u0437\u043e\u0439';return;}
+    var u=DB.users.find(function(x){return x.login===login&&x.pass===pass;});
+    if(!u){err.textContent='\u041d\u0435\u0432\u0435\u0440\u043d\u044b\u0439 \u043b\u043e\u0433\u0438\u043d \u0438\u043b\u0438 \u043f\u0430\u0440\u043e\u043b\u044c';return;}
+    ADMIN_ME=u;
+    document.getElementById('admin-login-wrap').style.display='none';
+    document.getElementById('admin-panel').classList.add('on');
+    document.getElementById('adm-username').textContent=u.login;
+    renderAdminTickets();renderAdminStats();
+    if(u.role==='superadmin')renderAdminUsers();
+    document.getElementById('admin-users-tab').style.display=u.role==='superadmin'?'':'none';
+  });
+}
+function adminLogout(){
+  ADMIN_ME=null;
+  document.getElementById('admin-login-wrap').style.display='flex';
+  document.getElementById('admin-panel').classList.remove('on');
+  document.getElementById('adm-log').value='';
+  document.getElementById('adm-pas').value='';
+  document.getElementById('adm-err').textContent='';
+}
+
+// ===== ADMIN TICKETS =====
+var adminFilter={status:'',type:'',search:''};
+var selectedTicketId=null;
+
+function renderAdminTickets(){
+  var tbody=document.getElementById('adm-tbody');
+  var list=DB.tickets.filter(function(t){
+    var ok=true;
+    if(adminFilter.status&&t.status!==adminFilter.status)ok=false;
+    if(adminFilter.type&&t.type!==adminFilter.type)ok=false;
+    if(adminFilter.search){
+      var s=adminFilter.search.toLowerCase();
+      ok=t.ticketNum.indexOf(s)!==-1||t.phone.indexOf(s)!==-1||(t.ownerName||'').toLowerCase().indexOf(s)!==-1;
+    }
+    return ok;
+  }).sort(function(a,b){return b.createdAt-a.createdAt;});
+
+  if(!list.length){
+    tbody.innerHTML='<tr><td colspan="7" class="empty">\u0417\u0430\u044f\u0432\u043e\u043a \u043d\u0435\u0442</td></tr>';
+    return;
+  }
+  tbody.innerHTML=list.map(function(t){
+    return '<tr class="t-clickable'+(selectedTicketId===t.id?' selected':'')+'" onclick="openTicketDetail('+t.id+')">'
+      +'<td style="font-family:monospace;font-weight:700">#'+t.ticketNum+'</td>'
+      +'<td>'+statusBadge(t.status)+'</td>'
+      +'<td><span class="type-badge">'+esc(TICKET_TYPES[t.type]||t.type)+'</span></td>'
+      +'<td style="font-family:monospace">'+esc(t.phone)+'</td>'
+      +'<td>'+esc(t.ownerName||'')+'</td>'
+      +'<td style="font-family:monospace">'+esc(t.atmId||'')+'</td>'
+      +'<td style="color:var(--muted);font-size:11px">'+fmtDate(t.createdAt)+'</td>'
+      +'</tr>';
+  }).join('');
+}
+
+function openTicketDetail(id){
+  selectedTicketId=id;
+  var t=DB.tickets.find(function(x){return x.id===id;});
+  if(!t)return;
+  renderAdminTickets();
+  var mo=document.getElementById('m-ticket-detail');
+  var body=mo.querySelector('.mo-body');
+
+  var fields={
+    card_stuck:{'\u041f\u043e\u0441\u043b. 4 \u0446\u0438\u0444\u0440\u044b':t.cardLast4,'\u0411\u0430\u043d\u043a':t.bank},
+    no_cash:{'\u041d\u043e\u043c\u0435\u0440 \u043a\u0430\u0440\u0442\u044b':t.cardNum,'\u0411\u0430\u043d\u043a':t.bank,'\u0421\u0443\u043c\u043c\u0430':t.amount},
+    top_up:{'\u041d\u043e\u043c\u0435\u0440 \u043a\u0430\u0440\u0442\u044b':t.cardNum,'\u0411\u0430\u043d\u043a':t.bank,'\u0421\u0443\u043c\u043c\u0430':t.amount},
+    credit:{'\u041d\u043e\u043c\u0435\u0440 \u043a\u0430\u0440\u0442\u044b':t.cardNum,'\u0411\u0430\u043d\u043a':t.bank,'\u0421\u0443\u043c\u043c\u0430':t.amount,'ID \u043a\u0440\u0435\u0434\u0438\u0442\u0430':t.creditId}
+  };
+  var tf=fields[t.type]||{};
+
+  var typeFieldsHtml='';
+  Object.keys(tf).forEach(function(k){
+    if(tf[k])typeFieldsHtml+='<div class="td-field"><div class="td-field-label">'+k+'</div><div class="td-field-val">'+esc(tf[k])+'</div></div>';
+  });
+
+  body.innerHTML='<div class="td-section">'
+    +'<div class="td-section-title">&#128196; \u041e\u0441\u043d\u043e\u0432\u043d\u0430\u044f \u0438\u043d\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u044f</div>'
+    +'<div class="td-grid">'
+    +'<div class="td-field"><div class="td-field-label">\u0422\u0438\u043f</div><div class="td-field-val">'+esc(TICKET_TYPES[t.type]||t.type)+'</div></div>'
+    +'<div class="td-field"><div class="td-field-label">ID \u0431\u0430\u043d\u043a\u043e\u043c\u0430\u0442\u0430</div><div class="td-field-val">'+esc(t.atmId||'')+'</div></div>'
+    +'<div class="td-field"><div class="td-field-label">\u0414\u0430\u0442\u0430 \u0438\u043d\u0446\u0438\u0434\u0435\u043d\u0442\u0430</div><div class="td-field-val">'+esc(t.incidentDate||'')+'</div></div>'
+    +'<div class="td-field"><div class="td-field-label">\u0412\u0440\u0435\u043c\u044f</div><div class="td-field-val">'+esc(t.incidentTime||'')+'</div></div>'
+    +typeFieldsHtml
+    +'</div></div>'
+    +'<div class="td-section">'
+    +'<div class="td-section-title">&#128100; \u0412\u043b\u0430\u0434\u0435\u043b\u0435\u0446 \u043a\u0430\u0440\u0442\u044b</div>'
+    +'<div class="td-grid">'
+    +'<div class="td-field"><div class="td-field-label">\u0424\u0418\u041e</div><div class="td-field-val">'+esc(t.ownerName||'')+'</div></div>'
+    +'<div class="td-field"><div class="td-field-label">\u0422\u0435\u043b\u0435\u0444\u043e\u043d</div><div class="td-field-val">'+esc(t.phone||'')+'</div></div>'
+    +'</div></div>'
+    +'<div class="td-section">'
+    +'<div class="td-section-title">&#9881;&#65039; \u0423\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u0435</div>'
+    +'<div class="fg"><label class="fl">\u0421\u0442\u0430\u0442\u0443\u0441 \u0437\u0430\u044f\u0432\u043a\u0438</label>'
+    +'<select class="stat-sel" id="det-status" style="margin-bottom:0">'
+    +'<option value="new"'+(t.status==='new'?' selected':'')+'>'+STATUSES.new+'</option>'
+    +'<option value="wait"'+(t.status==='wait'?' selected':'')+'>'+STATUSES.wait+'</option>'
+    +'<option value="done"'+(t.status==='done'?' selected':'')+'>'+STATUSES.done+'</option>'
+    +'</select></div>'
+    +'<div class="fg"><label class="fl">\u041a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439 \u0434\u043b\u044f \u043a\u043b\u0438\u0435\u043d\u0442\u0430</label>'
+    +'<div class="cmt-form"><textarea id="det-comment" placeholder="\u041a\u043e\u043c\u043c\u0435\u043d\u0442\u0430\u0440\u0438\u0439 \u0432\u0438\u0434\u0438\u0442 \u043a\u043b\u0438\u0435\u043d\u0442 \u043f\u0440\u0438 \u043e\u0442\u0441\u043b\u0435\u0436\u0438\u0432\u0430\u043d\u0438\u0438...">'+esc(t.comment||'')+'</textarea>'
+    +'<button class="btn bny" onclick="saveTicketDetail('+id+')">\u2713 \u0421\u043e\u0445\u0440\u0430\u043d\u0438\u0442\u044c</button>'
+    +'</div></div>'
+    +'</div>';
+
+  mo.querySelector('.mo-title').textContent='\u0422\u0438\u043a\u0435\u0442 #'+t.ticketNum;
+  mo.classList.add('on');
+}
+
+function saveTicketDetail(id){
+  var t=DB.tickets.find(function(x){return x.id===id;});if(!t)return;
+  t.status=document.getElementById('det-status').value;
+  t.comment=document.getElementById('det-comment').value.trim();
+  t.updatedAt=Date.now();
+  t.updatedBy=ADMIN_ME?ADMIN_ME.login:'';
+  saveDB().then(function(ok){
+    if(ok){toast('\u2713 \u0421\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u043e','ok');closeM('m-ticket-detail');renderAdminTickets();renderAdminStats();}
+    else toast('\u2717 \u041e\u0448\u0438\u0431\u043a\u0430 \u0441\u043e\u0445\u0440\u0430\u043d\u0435\u043d\u0438\u044f','err');
+  });
+}
+
+// ===== ADMIN STATS =====
+function renderAdminStats(){
+  var el=document.getElementById('stats-wrap');if(!el)return;
+  var total=DB.tickets.length;
+  var newC=DB.tickets.filter(function(t){return t.status==='new';}).length;
+  var waitC=DB.tickets.filter(function(t){return t.status==='wait';}).length;
+  var doneC=DB.tickets.filter(function(t){return t.status==='done';}).length;
+  var byType={};
+  DB.tickets.forEach(function(t){byType[t.type]=(byType[t.type]||0)+1;});
+  el.innerHTML='<div class="stat-cards">'
+    +'<div class="stat-card"><div class="stat-card-v">'+total+'</div><div class="stat-card-l">\u0412\u0441\u0435\u0433\u043e \u0437\u0430\u044f\u0432\u043e\u043a</div></div>'
+    +'<div class="stat-card"><div class="stat-card-v" style="color:var(--info)">'+newC+'</div><div class="stat-card-l">\u041d\u043e\u0432\u044b\u0445</div></div>'
+    +'<div class="stat-card"><div class="stat-card-v" style="color:var(--warn)">'+waitC+'</div><div class="stat-card-l">\u041e\u0436\u0438\u0434\u0430\u043d\u0438\u0435</div></div>'
+    +'<div class="stat-card"><div class="stat-card-v" style="color:var(--ok)">'+doneC+'</div><div class="stat-card-l">\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e</div></div>'
+    +'</div>'
+    +'<div style="font-size:12px;margin-top:14px"><strong style="font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)">\u041f\u043e \u0442\u0438\u043f\u0430\u043c:</strong><br>'
+    +Object.keys(TICKET_TYPES).map(function(k){return '<div style="margin-top:6px;display:flex;justify-content:space-between;max-width:300px"><span>'+TICKET_TYPES[k]+'</span><strong>'+(byType[k]||0)+'</strong></div>';}).join('')
+    +'</div>';
+}
+
+// ===== ADMIN USERS =====
+function renderAdminUsers(){
+  var tbody=document.getElementById('users-tbody');if(!tbody)return;
+  if(!DB.users.length){tbody.innerHTML='<tr><td colspan="3" class="empty">\u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u0435\u0439 \u043d\u0435\u0442</td></tr>';return;}
+  tbody.innerHTML=DB.users.map(function(u,i){
+    return '<tr><td>'+esc(u.login)+'</td>'
+      +'<td><span class="sbadge '+(u.role==='superadmin'?'sb-done':'sb-wait')+'">'+esc(u.role)+'</span></td>'
+      +'<td>'+(u.login!==ADMIN_ME.login?'<button class="btn bndg bsm" onclick="delUser(\''+esc(u.login)+'\')">\u0423\u0434\u0430\u043b\u0438\u0442\u044c</button>':'<span style="font-size:10px;color:var(--muted)">(\u0432\u044b)</span>')+'</td></tr>';
+  }).join('');
+}
+function addUser(){
+  var l=document.getElementById('nu-l').value.trim();
+  var p=document.getElementById('nu-p').value.trim();
+  var r=document.getElementById('nu-r').value;
+  if(!l||!p){toast('\u0417\u0430\u043f\u043e\u043b\u043d\u0438\u0442\u0435 \u043b\u043e\u0433\u0438\u043d \u0438 \u043f\u0430\u0440\u043e\u043b\u044c','err');return;}
+  if(DB.users.find(function(u){return u.login===l;})){toast('\u041b\u043e\u0433\u0438\u043d \u0437\u0430\u043d\u044f\u0442','err');return;}
+  DB.users.push({login:l,pass:p,role:r});
+  saveDB().then(function(ok){
+    if(ok){toast('\u2713 \u041f\u043e\u043b\u044c\u0437\u043e\u0432\u0430\u0442\u0435\u043b\u044c '+l+' \u0434\u043e\u0431\u0430\u0432\u043b\u0435\u043d','ok');document.getElementById('nu-l').value='';document.getElementById('nu-p').value='';renderAdminUsers();}
+    else toast('\u2717 \u041e\u0448\u0438\u0431\u043a\u0430','err');
+  });
+}
+function delUser(login){
+  if(!confirm('\u0423\u0434\u0430\u043b\u0438\u0442\u044c '+login+'?'))return;
+  DB.users=DB.users.filter(function(u){return u.login!==login;});
+  saveDB().then(function(ok){if(ok){toast('\u0423\u0434\u0430\u043b\u0451\u043d','ok');renderAdminUsers();}else toast('\u2717 \u041e\u0448\u0438\u0431\u043a\u0430','err');});
+}
+
+// ===== SETUP =====
+function saveSetup(){
+  var tok=document.getElementById('cfg-tok').value.trim();
+  var gst=document.getElementById('cfg-gst').value.trim();
+  var err=document.getElementById('cfg-err');
+  if(!tok||!gst){err.textContent='\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u043e\u043a\u0435\u043d \u0438 Gist ID';return;}
+  err.textContent='\u041f\u0440\u043e\u0432\u0435\u0440\u043a\u0430...';
+  TOK=tok;GST=gst;
+  loadDB().then(function(ok){
+    if(ok){
+      localStorage.setItem('kb_tok',tok);localStorage.setItem('kb_gst',gst);
+      err.textContent='';closeM('m-setup');
+      toast('\u2713 \u0411\u0430\u0437\u0430 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0430','ok');
+    } else {
+      err.textContent='\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0438\u0442\u044c\u0441\u044f.';
+      TOK='';GST='';
+    }
+  });
+}
+function initNewDB(){
+  var tok=document.getElementById('cfg-tok').value.trim();
+  var err=document.getElementById('cfg-err');
+  if(!tok){err.textContent='\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u043e\u043a\u0435\u043d';return;}
+  err.textContent='\u0421\u043e\u0437\u0434\u0430\u043d\u0438\u0435 \u0431\u0430\u0437\u044b...';
+  var init={tickets:[],users:[{login:'admin',pass:'Admin2024!',role:'superadmin'}],log:[],ticketCounter:10000000};
+  var body={};body[GF]={content:JSON.stringify(init,null,2)};
+  fetch('https://api.github.com/gists',{
+    method:'POST',
+    headers:{Authorization:'token '+tok,'Content-Type':'application/json'},
+    body:JSON.stringify({description:'Kapital Bank Tickets DB',public:false,files:body})
+  }).then(function(r){if(!r.ok){err.textContent='\u041e\u0448\u0438\u0431\u043a\u0430. \u041d\u0443\u0436\u0435\u043d scope: gist.';return null;}return r.json();})
+  .then(function(g){
+    if(!g)return;
+    TOK=tok;GST=g.id;DB=init;
+    localStorage.setItem('kb_tok',tok);localStorage.setItem('kb_gst',g.id);
+    err.textContent='';closeM('m-setup');
+    alert('\u0411\u0430\u0437\u0430 \u0441\u043e\u0437\u0434\u0430\u043d\u0430!\n\nGist ID: '+g.id+'\n\n\u0410\u0434\u043c\u0438\u043d: admin / Admin2024!\n\n\u0421\u043c\u0435\u043d\u0438\u0442\u0435 \u043f\u0430\u0440\u043e\u043b\u044c \u043f\u043e\u0441\u043b\u0435 \u0432\u0445\u043e\u0434\u0430!');
+    toast('\u2713 \u0411\u0430\u0437\u0430 \u0441\u043e\u0437\u0434\u0430\u043d\u0430','ok');
+  }).catch(function(e){err.textContent='\u041e\u0448\u0438\u0431\u043a\u0430: '+e.message;});
+}
+
+// ===== UTILS =====
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(ts){return new Date(ts).toLocaleString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function openM(id){var e=document.getElementById(id);if(e)e.classList.add('on');}
+function closeM(id){var e=document.getElementById(id);if(e)e.classList.remove('on');}
+function toast(msg,type){
+  var el=document.createElement('div');
+  el.className='ti'+(type==='ok'?' tok':type==='err'?' terr':type==='i'?' tinf':'');
+  el.textContent=msg;document.getElementById('toast').appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.parentNode.removeChild(el);},3500);
+}
+function togTheme(){
+  document.documentElement.classList.toggle('dk');
+  localStorage.setItem('kb_dk',document.documentElement.classList.contains('dk')?'1':'0');
+}
+
+// ===== BOOT =====
+document.addEventListener('DOMContentLoaded',function(){
+  if(localStorage.getItem('kb_dk')==='1')document.documentElement.classList.add('dk');
+  TOK=localStorage.getItem('kb_tok')||'';
+  GST=localStorage.getItem('kb_gst')||'';
+  if(TOK&&GST){loadDB().then(function(){});}
+  showPage('client');
+
+  document.querySelectorAll('.mo').forEach(function(m){
+    m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('on');});
+  });
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape')document.querySelectorAll('.mo.on').forEach(function(m){m.classList.remove('on');});
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+  });
+
+  var ap=document.getElementById('a-pas2');
+  if(ap)ap.addEventListener('keydown',function(e){if(e.key==='Enter')doAdminLogin();});
+  var si=document.getElementById('search-ticket-in');
+  if(si)si.addEventListener('keydown',function(e){if(e.key==='Enter')doSearchTicket();});
+  var sp=document.getElementById('search-phone-in');
+  if(sp)sp.addEventListener('keydown',function(e){if(e.key==='Enter')searchByPhone();});
+});
+
+</script>
+</body>
+</html>
