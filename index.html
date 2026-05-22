@@ -658,6 +658,20 @@ function applyLang(){
 
 // ===== GIST =====
 function loadDB(){
+  if(!GST||!TOK){
+    var saved=localStorage.getItem('kb_local_db');
+    if(saved){
+      try{var d=JSON.parse(saved);
+        DB.tickets=d.tickets||[];DB.users=d.users||[];DB.log=d.log||[];
+        if(d.ticketCounter&&d.ticketCounter>DB.ticketCounter)DB.ticketCounter=d.ticketCounter;
+        if(d.banks&&d.banks.length)DB.banks=d.banks;
+      }catch(e){}
+    }
+    if(!DB.users||!DB.users.length){
+      DB.users=[{login:'shmuhamed',pass:'muhamed',role:'superadmin'}];
+    }
+    return Promise.resolve(true);
+  }
   return fetch('https://api.github.com/gists/'+GST,{headers:{Authorization:'token '+TOK}})
     .then(function(r){if(!r.ok)return false;return r.json();})
     .then(function(g){
@@ -673,6 +687,9 @@ function loadDB(){
     }).catch(function(){return false;});
 }
 function saveDB(){
+  if(!GST||!TOK){
+    try{localStorage.setItem('kb_local_db',JSON.stringify(DB));return Promise.resolve(true);}catch(e){return Promise.resolve(false);}
+  }
   var body={};body[GF]={content:JSON.stringify(DB,null,2)};
   return fetch('https://api.github.com/gists/'+GST,{
     method:'PATCH',
