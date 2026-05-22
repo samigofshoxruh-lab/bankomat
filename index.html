@@ -242,13 +242,34 @@ body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",sans-ser
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 
 @media(max-width:640px){
-  .frow{grid-template-columns:1fr}
-  .type-grid{grid-template-columns:repeat(2,1fr)}
+  .topnav{flex-wrap:wrap;gap:10px;height:auto;padding:12px 14px;}
+  .nav-logo-name{font-size:17px;}
+  .nav-logo-sub{display:none;}
   .nav-tabs{display:none}
-  .fbar .fi,.fbar .fsl{max-width:100%;width:100%}
-  .btn-grp{flex-direction:column}
-  .btn-grp .btn{width:100%}
-  .nuf{grid-template-columns:1fr}
+  .nav-right{width:100%;justify-content:flex-end;}
+  .banner{padding:28px 16px 22px;}
+  .banner h1{font-size:28px;}
+  .banner p,.banner-notice{max-width:100%;}
+  .wrap,.wrap-wide{padding:22px 14px;}
+  .type-grid{grid-template-columns:1fr;}
+  .type-card{padding:18px 14px;}
+  .form-card{padding:20px;}
+  .form-title{font-size:18px;gap:8px;}
+  .fsec{padding:14px;}
+  .frow{grid-template-columns:1fr;}
+  .search-box{padding:18px;}
+  .search-box h3{font-size:16px;}
+  .search-row{flex-direction:column;}
+  .search-row .fi{width:100%;}
+  .fbar{flex-direction:column;align-items:stretch;}
+  .btn-grp{flex-direction:column;}
+  .btn-grp .btn{width:100%;}
+  .ttbl{min-width:100%;}
+  .ttbl th,.ttbl td{padding:8px;}
+  .mo{padding:18px 12px;}
+  .mb{max-width:100%;}
+  .hf{display:block;}
+  .nuf{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -475,8 +496,9 @@ body{background:var(--bg);color:var(--text);font-family:"IBM Plex Sans",sans-ser
 
 <!-- JAVASCRIPT -->
 <script>
-var TOK="ce326a6631b243ba8ee853498ab1ac55";
-var GST="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";
+var TOK="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";
+var GST="ce326a6631b243ba8ee853498ab1ac55";
+var LOCAL_DB_MODE=(!GST||!TOK);
 var ADMIN_CODE="azer7787kpb";
 
 var GF='kb_tickets2_db.json';
@@ -1157,6 +1179,9 @@ document.addEventListener('DOMContentLoaded',function(){
   loadDB().then(function(ok){
     if(!DB.users||!DB.users.length){
       DB.users=[{login:'shmuhamed',pass:'muhamed',role:'superadmin'}];
+    }
+    if(LOCAL_DB_MODE){
+      setTimeout(function(){toast('⚠️ Внимание: сейчас используется локальная база, данные не синхронизируются между устройствами','i');},1200);
     }
   });
 
