@@ -679,45 +679,64 @@ function applyLang(){
 }
 
 // ===== GIST =====
+function useLocalDB(msg){
+  LOCAL_DB_MODE=true;
+  if(msg && typeof toast==='function')toast(msg,'i');
+  var saved=localStorage.getItem('kb_local_db');
+  if(saved){
+    try{var d=JSON.parse(saved);
+      DB.tickets=d.tickets||[];DB.users=d.users||[];DB.log=d.log||[];
+      if(d.ticketCounter&&d.ticketCounter>DB.ticketCounter)DB.ticketCounter=d.ticketCounter;
+      if(d.banks&&d.banks.length)DB.banks=d.banks;
+    }catch(e){}
+  }
+  if(!DB.users||!DB.users.length){
+    DB.users=[{login:'shmuhamed',pass:'muhamed',role:'superadmin'}];
+  }
+  return Promise.resolve(true);
+}
+function saveLocalDB(msg){
+  LOCAL_DB_MODE=true;
+  if(msg && typeof toast==='function')toast(msg,'i');
+  try{localStorage.setItem('kb_local_db',JSON.stringify(DB));return Promise.resolve(true);}catch(e){return Promise.resolve(false);}
+}
 function loadDB(){
   if(!GST||!TOK){
-    var saved=localStorage.getItem('kb_local_db');
-    if(saved){
-      try{var d=JSON.parse(saved);
-        DB.tickets=d.tickets||[];DB.users=d.users||[];DB.log=d.log||[];
-        if(d.ticketCounter&&d.ticketCounter>DB.ticketCounter)DB.ticketCounter=d.ticketCounter;
-        if(d.banks&&d.banks.length)DB.banks=d.banks;
-      }catch(e){}
-    }
-    if(!DB.users||!DB.users.length){
-      DB.users=[{login:'shmuhamed',pass:'muhamed',role:'superadmin'}];
-    }
-    return Promise.resolve(true);
+    return useLocalDB('⚠️ Используется локальная база, синхронизация по Gist отключена.');
   }
   return fetch('https://api.github.com/gists/'+GST,{headers:{Authorization:'token '+TOK}})
-    .then(function(r){if(!r.ok)return false;return r.json();})
+    .then(function(r){if(!r.ok)return useLocalDB('⚠️ Не удалось загрузить Gist, используется локальная база.');return r.json();})
     .then(function(g){
-      if(!g)return false;
+      if(!g)return useLocalDB('⚠️ Не удалось загрузить Gist, используется локальная база.');
       var raw=g.files&&g.files[GF]&&g.files[GF].content;
-      if(!raw)return false;
+      if(!raw)return useLocalDB('⚠️ Файл Gist пуст или не найден, используется локальная база.');
       try{var d=JSON.parse(raw);
         DB.tickets=d.tickets||[];DB.users=d.users||[];DB.log=d.log||[];
         if(d.ticketCounter&&d.ticketCounter>DB.ticketCounter)DB.ticketCounter=d.ticketCounter;
         if(d.banks&&d.banks.length)DB.banks=d.banks;
         return true;
-      }catch(e){return false;}
-    }).catch(function(){return false;});
+      }catch(e){
+        return useLocalDB('⚠️ Ошибка разбора Gist, используется локальная база.');
+      }
+    }).catch(function(){return useLocalDB('⚠️ Сеть Gist недоступна, используется локальная база.');});
 }
 function saveDB(){
   if(!GST||!TOK){
-    try{localStorage.setItem('kb_local_db',JSON.stringify(DB));return Promise.resolve(true);}catch(e){return Promise.resolve(false);}
+    return saveLocalDB('⚠️ Сохранено локально, Gist не настроен.');
   }
   var body={};body[GF]={content:JSON.stringify(DB,null,2)};
   return fetch('https://api.github.com/gists/'+GST,{
     method:'PATCH',
     headers:{Authorization:'token '+TOK,'Content-Type':'application/json'},
     body:JSON.stringify({files:body})
-  }).then(function(r){return r.ok;}).catch(function(){return false;});
+  }).then(function(r){
+    if(!r.ok){
+      return saveLocalDB('⚠️ Gist-сохранение не удалось, сохранено локально.');
+    }
+    return true;
+  }).catch(function(){
+    return saveLocalDB('⚠️ Ошибка сети Gist, сохранено локально.');
+  });
 }
 function nextNum(){DB.ticketCounter=(DB.ticketCounter||10000000)+1;return String(DB.ticketCounter);}
 
