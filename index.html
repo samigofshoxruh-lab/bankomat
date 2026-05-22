@@ -705,20 +705,34 @@ function loadDB(){
     return useLocalDB('⚠️ Используется локальная база, синхронизация по Gist отключена.');
   }
   return fetch('https://api.github.com/gists/'+GST,{headers:{Authorization:'token '+TOK}})
-    .then(function(r){if(!r.ok)return useLocalDB('⚠️ Не удалось загрузить Gist, используется локальная база.');return r.json();})
+    .then(function(r){
+      if(!r.ok){
+        return r.text().then(function(txt){
+          var err='⚠️ Gist load failed '+r.status+' '+r.statusText+': '+(txt||'no details');
+          console.warn(err);
+          return useLocalDB(err);
+        });
+      }
+      return r.json();
+    })
     .then(function(g){
-      if(!g)return useLocalDB('⚠️ Не удалось загрузить Gist, используется локальная база.');
+      if(g===true) return true;
+      if(!g) return useLocalDB('⚠️ Не удалось загрузить Gist, используется локальная база.');
       var raw=g.files&&g.files[GF]&&g.files[GF].content;
-      if(!raw)return useLocalDB('⚠️ Файл Gist пуст или не найден, используется локальная база.');
+      if(!raw) return useLocalDB('⚠️ Файл Gist пуст или не найден: '+GF);
       try{var d=JSON.parse(raw);
         DB.tickets=d.tickets||[];DB.users=d.users||[];DB.log=d.log||[];
         if(d.ticketCounter&&d.ticketCounter>DB.ticketCounter)DB.ticketCounter=d.ticketCounter;
         if(d.banks&&d.banks.length)DB.banks=d.banks;
         return true;
       }catch(e){
+        console.error('Gist parse error', e);
         return useLocalDB('⚠️ Ошибка разбора Gist, используется локальная база.');
       }
-    }).catch(function(){return useLocalDB('⚠️ Сеть Gist недоступна, используется локальная база.');});
+    }).catch(function(e){
+      console.error('Gist fetch error', e);
+      return useLocalDB('⚠️ Сеть Gist недоступна: '+(e.message||e));
+    });
 }
 function saveDB(){
   if(!GST||!TOK){
@@ -731,11 +745,16 @@ function saveDB(){
     body:JSON.stringify({files:body})
   }).then(function(r){
     if(!r.ok){
-      return saveLocalDB('⚠️ Gist-сохранение не удалось, сохранено локально.');
+      return r.text().then(function(txt){
+        var err='⚠️ Gist save failed '+r.status+' '+r.statusText+': '+(txt||'no details');
+        console.warn(err);
+        return saveLocalDB(err);
+      });
     }
     return true;
-  }).catch(function(){
-    return saveLocalDB('⚠️ Ошибка сети Gist, сохранено локально.');
+  }).catch(function(e){
+    console.error('Gist save error', e);
+    return saveLocalDB('⚠️ Ошибка сети Gist, сохранено локально: '+(e.message||e));
   });
 }
 function nextNum(){DB.ticketCounter=(DB.ticketCounter||10000000)+1;return String(DB.ticketCounter);}
